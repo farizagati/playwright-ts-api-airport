@@ -29,7 +29,8 @@ export default defineConfig({
     // baseURL: 'http://localhost:3000',
     baseURL: 'https://airportgap.com/api',
     extraHTTPHeaders: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     },
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
