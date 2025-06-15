@@ -17,6 +17,6 @@ test.describe('POST /tokens', () => {
     expect(body).toHaveProperty('token');
     expect(typeof body.token).toBe('string');
     expect(body.token.length).toBeGreaterThan(0);
-    
+
   });
 });
