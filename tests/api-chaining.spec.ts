@@ -7,8 +7,8 @@ test.beforeAll(async () => {
   const requestContext = await playwrightRequest.newContext();
   const tokenResponse = await requestContext.post('https://airportgap.com/api/tokens', {
     data: { 
-        email: 'test@airportgap.com', // YOUR EMAIL HERE
-        password: 'airportgappassword' // YOUR PASSWORD HERE
+        email: 'akuntesares01+1@gmail.com', // YOUR EMAIL HERE
+        password: 'YoNdakTauKokTanyaSaya' // YOUR PASSWORD HERE
     },
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' }
   });
@@ -22,9 +22,15 @@ test.beforeAll(async () => {
 
 test.describe.serial('API Chaining Flow', () => {
   test('should GET airport, add favorite, edit note, GET favorite, DELETE the favorite, and verify the favorite is deleted', async ({ request }) => {
+    const firstNote = 'Testing Note 1'
+    const editedNote = 'Changed Note 2'
+
     // 1. GET Airport list
     const airportListResponse = await request.get('/api/airports');
+    // Assert HTTP status response
     expect(airportListResponse.status()).toBe(200);
+
+    //Assert response structure
     const airportListBody = await airportListResponse.json();
     expect(Array.isArray(airportListBody.data)).toBeTruthy();
     //get the data array 0
@@ -35,31 +41,35 @@ test.describe.serial('API Chaining Flow', () => {
     const createFavoriteResponse = await request.post('/api/favorites', {
       data: { 
         airport_id: airportId, 
-        note: 'Testing Note 1' 
+        note: firstNote //obtain from defined note above
       },
       headers: { 
         Authorization: `Token ${authToken}`, 
         Accept: 'application/json'
       }
     });
+    //assert http status
     expect(createFavoriteResponse.status()).toBe(201);
+    //assert response and value from favorite data
     const createFavoriteBody = await createFavoriteResponse.json();
     const favoriteId = createFavoriteBody.data.id;
-    expect(createFavoriteBody.data.attributes.note).toBe('Testing Note 1');
+    expect(createFavoriteBody.data.attributes.note).toBe(firstNote);
 
     // 3. Edit Note in favorite
     const editNoteResponse = await request.patch(`/api/favorites/${favoriteId}`, {
       data: { 
-        note: 'Edited Note 2' 
+        note: editedNote //obtain from defined note above
       },
       headers: { 
         Authorization: `Token ${authToken}`, 
         Accept: 'application/json' 
       }
     });
+    //assert http status
     expect(editNoteResponse.status()).toBe(200);
+    //assert edited note
     const editNoteBody = await editNoteResponse.json();
-    expect(editNoteBody.data.attributes.note).toBe('Edited Note 2');
+    expect(editNoteBody.data.attributes.note).toBe(editedNote);
 
     // 4. GET Favorite
     const getFavoriteResponse = await request.get(`/api/favorites/${favoriteId}`, {
@@ -68,10 +78,12 @@ test.describe.serial('API Chaining Flow', () => {
         Accept: 'application/json' 
       }
     });
+    //assert http status
     expect(getFavoriteResponse.status()).toBe(200);
+    //assert edited note
     const getFavoriteBody = await getFavoriteResponse.json();
     expect(getFavoriteBody.data.id).toBe(favoriteId);
-    expect(getFavoriteBody.data.attributes.note).toBe('Edited Note 2');
+    expect(getFavoriteBody.data.attributes.note).toBe(editedNote);
 
     // 5. Clear all favorites
     const clearAllResponse = await request.delete('/api/favorites/clear_all', {
@@ -89,7 +101,9 @@ test.describe.serial('API Chaining Flow', () => {
         Accept: 'application/json' 
       }
     });
+    //assert http status
     expect(finalListResponse.status()).toBe(200);
+    //assert stored favorites should be empty
     const finalListBody = await finalListResponse.json();
     expect(Array.isArray(finalListBody.data)).toBeTruthy();
     expect(finalListBody.data).toEqual([]);
